@@ -1,4 +1,4 @@
-module stkof
+module github.com/SoonDubu923/go-forum
 
 go 1.22.5
 
