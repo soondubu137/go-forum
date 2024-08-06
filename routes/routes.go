@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"stkof/logger"
+	"github.com/SoonDubu923/go-forum/logger"
 
 	"github.com/gin-gonic/gin"
 )
