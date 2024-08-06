@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"scaffold/config"
-	"scaffold/dao/mysql"
-	"scaffold/dao/redis"
-	"scaffold/logger"
-	"scaffold/routes"
+	"stkof/config"
+	"stkof/dao/mysql"
+	"stkof/dao/redis"
+	"stkof/logger"
+	"stkof/pkg/snowflake"
+	"stkof/routes"
 	"syscall"
 	"time"
 
@@ -36,6 +37,11 @@ func main() {
 
     // register routes
     r := routes.Setup()
+
+    // initialize snowflake node
+    if err := snowflake.Init(viper.GetString("snowflake.start_time"), viper.GetInt64("snowflake.machine_id")); err != nil {
+        zap.L().Fatal("snowflake.Init failed", zap.Error(err))
+    }
 
     // start server (graceful shutdown)
     server := &http.Server{
