@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"scaffold/logger"
+	"stkof/logger"
 
 	"github.com/gin-gonic/gin"
 )

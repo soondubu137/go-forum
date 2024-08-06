@@ -12,7 +12,7 @@ import (
 var db *sqlx.DB
 
 func Init() (err error) {
-    dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8",
+    dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4",
         viper.GetString("mysql.user"),
         viper.GetString("mysql.password"),
         viper.GetString("mysql.host"),
