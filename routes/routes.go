@@ -20,6 +20,7 @@ func Setup(mode string) *gin.Engine {
 
     // register routes here
     r.POST("/register", controller.RegisterHandler)
+    r.POST("/login", controller.LoginHandler)
 
     r.NoRoute(func(c *gin.Context) {
         c.JSON(http.StatusNotFound, gin.H{"status": "Error", "message": "Page not found"})

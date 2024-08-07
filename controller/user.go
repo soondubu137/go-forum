@@ -46,3 +46,47 @@ func RegisterHandler(c *gin.Context) {
         "message": "Registration successful",
     })
 }
+
+func LoginHandler(c *gin.Context) {
+    // bind request parameters
+    var p model.ParamLogin
+    if err := c.ShouldBindJSON(&p); err != nil {
+        var validationErrors []string
+        // collect validation errors, if any
+        if errs, ok := err.(validator.ValidationErrors); ok {
+            for _, err := range errs {
+                validationErrors = append(validationErrors, err.Error())
+            }
+        // if not a validation error, just append the error message
+        } else {
+            validationErrors = append(validationErrors, err.Error())
+        }
+        zap.L().Error("invalid request parameters for LoginHandler", zap.Strings("errors", validationErrors))
+        c.JSON(http.StatusBadRequest, gin.H{
+            "status": "Error",
+            "errors": validationErrors,
+        })
+        return
+    }
+    // hand over to service layer
+    if err := service.Login(&p); err != nil {
+        zap.L().Error("service.Login failed", zap.Error(err))
+        if err.Error() == "incorrect credentials" {
+            c.JSON(http.StatusUnauthorized, gin.H{
+                "status": "Error",
+                "message": "Incorrect credentials",
+            })
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{
+                "status": "Error",
+                "message": "Internal server error",
+            })
+        }
+        return
+    }
+    // return success
+    c.JSON(http.StatusOK, gin.H{
+        "status": "Success",
+        "message": "Login successful",
+    })
+}

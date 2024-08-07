@@ -33,3 +33,20 @@ func Register(p *model.ParamRegister) (err error) {
 
     return
 }
+
+// Login logs in a user.
+func Login(p *model.ParamLogin) (err error) {
+    // create a new user instance
+    user := &model.User{
+        Username: p.Username,
+        Password: p.Password,
+    }
+
+    // log in the user
+    if err = mysql.Login(user); err != nil {
+        zap.L().Error("mysql.Login failed", zap.Error(err))
+        return
+    }
+
+    return
+}
