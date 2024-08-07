@@ -9,7 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Setup() *gin.Engine {
+func Setup(mode string) *gin.Engine {
+    // if in release mode, use the release mode of Gin
+    if mode == gin.ReleaseMode {
+        gin.SetMode(gin.ReleaseMode)
+    }
+
     r := gin.New()
     r.Use(logger.GinLogger(), logger.GinRecovery(true))
 

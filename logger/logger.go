@@ -17,20 +17,32 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func Init(cfg *config.LogConfig) (err error) {
+// Init initializes the logger.
+func Init(cfg *config.LogConfig, mode string) (err error) {
 	writeSyncer := getLogWriter(
         cfg.Filename,
         cfg.MaxSize,
         cfg.MaxBackups,
         cfg.MaxAge,
     )
+    // encoder is used to encode the log to JSON format to store in the file
 	encoder := getEncoder()
 	var l = new(zapcore.Level)
 	err = l.UnmarshalText([]byte(cfg.Level))
 	if err != nil {
 		return
 	}
-	core := zapcore.NewCore(encoder, writeSyncer, l)
+    var core zapcore.Core
+    // in development mode, logs are printed to the console as well
+    if mode == "development" {
+        enc := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+        core = zapcore.NewTee(
+            zapcore.NewCore(encoder, writeSyncer, l),                          // write to file
+            zapcore.NewCore(enc, zapcore.Lock(os.Stdout), zapcore.DebugLevel), // write to console
+        )
+    } else {
+        core = zapcore.NewCore(encoder, writeSyncer, l)
+    }
 
 	lg := zap.New(core, zap.AddCaller())
 	zap.ReplaceGlobals(lg)
