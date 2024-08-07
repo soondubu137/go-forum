@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 
+	errmsg "github.com/SoonDubu923/go-forum/errors"
 	"github.com/SoonDubu923/go-forum/model"
 )
 
@@ -16,7 +17,7 @@ func CheckIfUserExists(username string) (err error) {
         return
     }
     if count > 0 {
-        return errors.New("username already exists")
+        return errors.New(errmsg.ErrUserExists)
     }
     return
 }
@@ -57,7 +58,7 @@ func Login(p *model.User) error {
     // retrieve the user from the database
     if err := db.Get(&user, "SELECT user_id, username, password, salt FROM user WHERE username = ?", p.Username); err != nil {
         if err.Error() == "sql: no rows in result set" {
-            return errors.New("incorrect credentials")
+            return errors.New(errmsg.ErrIncorrectCredentials)
         }
         return err
     }
@@ -72,7 +73,7 @@ func Login(p *model.User) error {
     // hash the salted password
     hashedPassword := sha256.Sum256(saltedPassword)
     if hex.EncodeToString(hashedPassword[:]) != user.Password {
-        return errors.New("incorrect credentials")
+        return errors.New(errmsg.ErrIncorrectCredentials)
     }
     return nil
 }

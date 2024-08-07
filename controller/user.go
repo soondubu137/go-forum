@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/SoonDubu923/go-forum/model"
 	"github.com/SoonDubu923/go-forum/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
+
+	errmsg "github.com/SoonDubu923/go-forum/errors"
 )
 
 func RegisterHandler(c *gin.Context) {
@@ -25,26 +25,17 @@ func RegisterHandler(c *gin.Context) {
             validationErrors = append(validationErrors, err.Error())
         }
         zap.L().Error("invalid request parameters for RegisterHandler", zap.Strings("errors", validationErrors))
-        c.JSON(http.StatusBadRequest, gin.H{
-            "status": "Error",
-            "errors": validationErrors,
-        })
+        ErrorResponseWithMessage(c, CodeInvalidRequest, validationErrors)
         return
     }
     // hand over to service layer
     if err := service.Register(&p); err != nil {
         zap.L().Error("service.Register failed", zap.Error(err))
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status": "Error",
-            "message": "Registration failed",
-        })
+        ErrorResponse(c, CodeServerError)
         return
     }
     // return success
-    c.JSON(http.StatusOK, gin.H{
-        "status": "Success",
-        "message": "Registration successful",
-    })
+    SuccessResponse(c, CodeSuccess, nil)
 }
 
 func LoginHandler(c *gin.Context) {
@@ -62,31 +53,19 @@ func LoginHandler(c *gin.Context) {
             validationErrors = append(validationErrors, err.Error())
         }
         zap.L().Error("invalid request parameters for LoginHandler", zap.Strings("errors", validationErrors))
-        c.JSON(http.StatusBadRequest, gin.H{
-            "status": "Error",
-            "errors": validationErrors,
-        })
+        ErrorResponseWithMessage(c, CodeInvalidRequest, validationErrors)
         return
     }
     // hand over to service layer
     if err := service.Login(&p); err != nil {
         zap.L().Error("service.Login failed", zap.Error(err))
-        if err.Error() == "incorrect credentials" {
-            c.JSON(http.StatusUnauthorized, gin.H{
-                "status": "Error",
-                "message": "Incorrect credentials",
-            })
+        if err.Error() == errmsg.ErrIncorrectCredentials {
+            ErrorResponse(c, CodeInvalidCredentials)
         } else {
-            c.JSON(http.StatusInternalServerError, gin.H{
-                "status": "Error",
-                "message": "Internal server error",
-            })
+            ErrorResponse(c, CodeServerError)
         }
         return
     }
     // return success
-    c.JSON(http.StatusOK, gin.H{
-        "status": "Success",
-        "message": "Login successful",
-    })
+    SuccessResponse(c, CodeSuccess, nil)
 }
