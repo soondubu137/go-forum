@@ -24,7 +24,7 @@ func main() {
     config.Init()
 
     // initialize logger
-    if err := logger.Init(config.Conf.LogConfig); err != nil {
+    if err := logger.Init(config.Conf.LogConfig, config.Conf.Mode); err != nil {
         panic(fmt.Sprintf("init logger failed: %v", err))
     }
     defer zap.L().Sync()
@@ -42,7 +42,7 @@ func main() {
     // defer redis.Close()
 
     // register routes
-    r := routes.Setup()
+    r := routes.Setup(config.Conf.Mode)
 
     // initialize snowflake node
     if err := snowflake.Init(config.Conf.SnowflakeConfig); err != nil {
