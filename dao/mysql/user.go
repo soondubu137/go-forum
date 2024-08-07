@@ -70,10 +70,13 @@ func Login(p *model.User) error {
     }
     saltedPassword := append([]byte(p.Password), salt...)
 
-    // hash the salted password
+    // hash the salted password and compare it with the hashed password from the database
     hashedPassword := sha256.Sum256(saltedPassword)
     if hex.EncodeToString(hashedPassword[:]) != user.Password {
         return errors.New(errmsg.ErrIncorrectCredentials)
     }
+
+    // p is a pointer and the UserID field is needed in the service layer for JWT generation
+    p.UserID = user.UserID
     return nil
 }

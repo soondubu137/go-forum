@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/SoonDubu923/go-forum/dao/mysql"
 	"github.com/SoonDubu923/go-forum/model"
+	"github.com/SoonDubu923/go-forum/pkg/jwt"
 	"github.com/SoonDubu923/go-forum/pkg/snowflake"
 	"go.uber.org/zap"
 )
@@ -35,7 +36,7 @@ func Register(p *model.ParamRegister) (err error) {
 }
 
 // Login logs in a user.
-func Login(p *model.ParamLogin) (err error) {
+func Login(p *model.ParamLogin) (tokenString string, err error) {
     // create a new user instance
     user := &model.User{
         Username: p.Username,
@@ -48,5 +49,6 @@ func Login(p *model.ParamLogin) (err error) {
         return
     }
 
-    return
+    // generate a JWT token
+    return jwt.GenToken(user.UserID)
 }

@@ -12,6 +12,8 @@ const (
     CodeUserExists
     CodeUserNotExists
     CodeInvalidCredentials
+    CodeTokenMissing
+    CodeInvalidToken
     CodeServerBusy
 )
 
@@ -23,6 +25,8 @@ var codeMessageMap = map[ResponseCode]string{
     CodeUserExists:         "User already exists",
     CodeUserNotExists:      "User does not exist",
     CodeInvalidCredentials: "Incorrect password",
+    CodeTokenMissing:       "Token missing",
+    CodeInvalidToken:       "Invalid token",
     CodeServerBusy:         "Server busy",
 }
 
@@ -34,6 +38,8 @@ var codeHttpStatusMap = map[ResponseCode]int{
     CodeUserExists:         http.StatusConflict,
     CodeUserNotExists:      http.StatusNotFound,
     CodeInvalidCredentials: http.StatusUnauthorized,
+    CodeTokenMissing:       http.StatusUnauthorized,
+    CodeInvalidToken:       http.StatusUnauthorized,
     CodeServerBusy:         http.StatusServiceUnavailable,
 }
 

@@ -57,15 +57,19 @@ func LoginHandler(c *gin.Context) {
         return
     }
     // hand over to service layer
-    if err := service.Login(&p); err != nil {
+    tokenString, err := service.Login(&p)
+    if err != nil {
         zap.L().Error("service.Login failed", zap.Error(err))
-        if err.Error() == errmsg.ErrIncorrectCredentials {
-            ErrorResponse(c, CodeInvalidCredentials)
-        } else {
+        switch err.Error() {
+        case errmsg.ErrIncorrectCredentials:
+            ErrorResponseWithMessage(c, CodeInvalidCredentials, errmsg.ErrIncorrectCredentials)
+        case errmsg.ErrInvalidToken:
+            ErrorResponseWithMessage(c, CodeInvalidToken, errmsg.ErrInvalidToken)
+        default:
             ErrorResponse(c, CodeServerError)
         }
         return
     }
     // return success
-    SuccessResponse(c, CodeSuccess, nil)
+    SuccessResponse(c, CodeSuccess, tokenString)
 }
