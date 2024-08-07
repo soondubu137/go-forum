@@ -24,4 +24,9 @@ go.work.sum
 # env file
 .env
 
+# System and IDE files
 .DS_Store
+.vscode
+
+# Logs
+logs/

@@ -13,12 +13,13 @@ var Conf = new(Config)
 type Config struct {
     Name    string   `mapstructure:"name"`
     Mode    string   `mapstructure:"mode"`
+    Host    string   `mapstructure:"host"`
     Port    int      `mapstructure:"port"`
     Version string   `mapstructure:"version"`
     *LogConfig       `mapstructure:"log"`
     *MySQLConfig     `mapstructure:"mysql"`
     *RedisConfig     `mapstructure:"redis"`
-    *snowflakeConfig `mapstructure:"snowflake"`
+    *SnowflakeConfig `mapstructure:"snowflake"`
 }
 
 type LogConfig struct {
@@ -47,7 +48,7 @@ type RedisConfig struct {
     PoolSize int    `mapstructure:"pool_size"`
 }
 
-type snowflakeConfig struct {
+type SnowflakeConfig struct {
     StartTime string `mapstructure:"start_time"`
     MachineID int64  `mapstructure:"machine_id"`
 }

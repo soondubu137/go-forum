@@ -1,14 +1,16 @@
-app:
-  name: "go-forum"
-  mode: "development"
-  port: 8000
-  version: "1.0.0"
+name: "go-forum"
+mode: "development"
+host: "localhost"
+port: 8000
+version: "1.0.0"
+
 log:
   level: "debug"
   max_size: 100
   max_age: 30
   max_backup: 3
   filename: "logs/app.log"
+
 mysql:
   host: "localhost"
   port: 33060
@@ -17,12 +19,14 @@ mysql:
   db: "stkof"
   max_open_conns: 10
   max_idle_conns: 5
+
 redis:
   host: "localhost"
   port: 6379
   password: ""
   db: 0
   pool_size: 10
+
 snowflake:
-  start_time: 2024-08-01
+  start_time: "2024-08-01"
   machine_id: 1

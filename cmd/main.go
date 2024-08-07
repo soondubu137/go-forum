@@ -16,7 +16,6 @@ import (
 	"github.com/SoonDubu923/go-forum/pkg/snowflake"
 	"github.com/SoonDubu923/go-forum/routes"
 
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -46,17 +45,18 @@ func main() {
     r := routes.Setup()
 
     // initialize snowflake node
-    if err := snowflake.Init(viper.GetString("snowflake.start_time"), viper.GetInt64("snowflake.machine_id")); err != nil {
+    if err := snowflake.Init(config.Conf.SnowflakeConfig); err != nil {
         zap.L().Fatal("snowflake.Init failed", zap.Error(err))
     }
 
     // start server (graceful shutdown)
     server := &http.Server{
-        Addr: fmt.Sprintf(":%d", viper.GetInt("server.port")),
+        Addr: fmt.Sprintf("%s:%d", config.Conf.Host, config.Conf.Port),
         Handler: r,
     }
 
     go func() {
+        zap.L().Info("Starting server", zap.String("addr", server.Addr))
         if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
             zap.L().Fatal("listen: %s\n", zap.Error(err))
         }
