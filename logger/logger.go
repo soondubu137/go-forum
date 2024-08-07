@@ -9,23 +9,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SoonDubu923/go-forum/config"
+
 	"github.com/gin-gonic/gin"
 	"github.com/natefinch/lumberjack"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func Init() (err error) {
+func Init(cfg *config.LogConfig) (err error) {
 	writeSyncer := getLogWriter(
-        viper.GetString("log.filename"),
-        viper.GetInt("log.max_size"),
-        viper.GetInt("log.max_backup"),
-        viper.GetInt("log.max_age"),
+        cfg.Filename,
+        cfg.MaxSize,
+        cfg.MaxBackups,
+        cfg.MaxAge,
     )
 	encoder := getEncoder()
 	var l = new(zapcore.Level)
-	err = l.UnmarshalText([]byte(viper.GetString("log.level")))
+	err = l.UnmarshalText([]byte(cfg.Level))
 	if err != nil {
 		return
 	}

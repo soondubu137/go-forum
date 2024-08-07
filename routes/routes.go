@@ -9,6 +9,6 @@ import (
 func Setup() *gin.Engine {
     r := gin.New()
     r.Use(logger.GinLogger(), logger.GinRecovery(true))
-    // register routes
+    // register routes here
     return r
 }
