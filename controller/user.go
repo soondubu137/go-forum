@@ -15,10 +15,12 @@ func RegisterHandler(c *gin.Context) {
     var p model.ParamRegister
     if err := c.ShouldBindJSON(&p); err != nil {
         var validationErrors []string
+        // collect validation errors, if any
         if errs, ok := err.(validator.ValidationErrors); ok {
             for _, err := range errs {
                 validationErrors = append(validationErrors, err.Error())
             }
+        // if not a validation error, just append the error message
         } else {
             validationErrors = append(validationErrors, err.Error())
         }
@@ -30,5 +32,17 @@ func RegisterHandler(c *gin.Context) {
         return
     }
     // hand over to service layer
-    service.Register(&p)
+    if err := service.Register(&p); err != nil {
+        zap.L().Error("service.Register failed", zap.Error(err))
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status": "Error",
+            "message": "Registration failed",
+        })
+        return
+    }
+    // return success
+    c.JSON(http.StatusOK, gin.H{
+        "status": "Success",
+        "message": "Registration successful",
+    })
 }

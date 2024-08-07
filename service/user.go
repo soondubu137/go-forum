@@ -1,7 +1,35 @@
 package service
 
-import "github.com/SoonDubu923/go-forum/model"
+import (
+	"github.com/SoonDubu923/go-forum/dao/mysql"
+	"github.com/SoonDubu923/go-forum/model"
+	"github.com/SoonDubu923/go-forum/pkg/snowflake"
+	"go.uber.org/zap"
+)
 
-func Register(p *model.ParamRegister) {
+// Register registers a new user.
+func Register(p *model.ParamRegister) (err error) {
+    // check if the username already exists
+    if err = mysql.CheckIfUserExists(p.Username); err != nil {
+        zap.L().Error("mysql.CheckIfUserExists failed", zap.Error(err))
+        return
+    }
 
+    // generate a unique user ID
+    userID := snowflake.GenID()
+
+    // create a new user instance
+    user := model.User{
+        UserID:   userID,
+        Username: p.Username,
+        Password: p.Password,
+    }
+
+    // save the user to the database
+    if err = mysql.SaveUser(&user); err != nil {
+        zap.L().Error("mysql.SaveUser failed", zap.Error(err))
+        return
+    }
+
+    return
 }

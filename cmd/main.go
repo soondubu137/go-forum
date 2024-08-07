@@ -11,7 +11,7 @@ import (
 
 	"github.com/SoonDubu923/go-forum/config"
 	"github.com/SoonDubu923/go-forum/dao/mysql"
-	"github.com/SoonDubu923/go-forum/dao/redis"
+	_ "github.com/SoonDubu923/go-forum/dao/redis"
 	"github.com/SoonDubu923/go-forum/logger"
 	"github.com/SoonDubu923/go-forum/pkg/snowflake"
 	"github.com/SoonDubu923/go-forum/routes"
@@ -36,10 +36,10 @@ func main() {
     defer mysql.Close()
 
     // initialize Redis connection
-    if err := redis.Init(config.Conf.RedisConfig); err != nil {
-        zap.L().Fatal("redis.Init failed", zap.Error(err))
-    }
-    defer redis.Close()
+    // if err := redis.Init(config.Conf.RedisConfig); err != nil {
+    //     zap.L().Fatal("redis.Init failed", zap.Error(err))
+    // }
+    // defer redis.Close()
 
     // register routes
     r := routes.Setup()
