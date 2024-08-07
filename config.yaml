@@ -11,10 +11,10 @@ log:
   filename: "logs/app.log"
 mysql:
   host: "localhost"
-  port: 3306
+  port: 33060
   user: "root"
   password: "root"
-  db: "db"
+  db: "stkof"
   max_open_conns: 10
   max_idle_conns: 5
 redis:

@@ -25,15 +25,21 @@ func main() {
     config.Init()
 
     // initialize logger
-    logger.Init()
+    if err := logger.Init(config.Conf.LogConfig); err != nil {
+        panic(fmt.Sprintf("init logger failed: %v", err))
+    }
     defer zap.L().Sync()
 
     // initialize database connection
-    mysql.Init()
+    if err := mysql.Init(config.Conf.MySQLConfig); err != nil {
+        zap.L().Fatal("mysql.Init failed", zap.Error(err))
+    }
     defer mysql.Close()
 
     // initialize Redis connection
-    redis.Init()
+    if err := redis.Init(config.Conf.RedisConfig); err != nil {
+        zap.L().Fatal("redis.Init failed", zap.Error(err))
+    }
     defer redis.Close()
 
     // register routes
