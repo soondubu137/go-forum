@@ -30,3 +30,6 @@ go.work.sum
 
 # Logs
 logs/
+
+# API testing
+go-forum-api-testing
