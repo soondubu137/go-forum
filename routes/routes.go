@@ -27,10 +27,11 @@ func Setup(mode string) *gin.Engine {
     v1.Use(middleware.AuthMiddleware())
     {
         v1.GET("/community", controller.CommunityHandler)
+        v1.GET("/community/:id", controller.CommunityDetailHandler)
     }
 
     r.NoRoute(func(c *gin.Context) {
-        c.JSON(http.StatusNotFound, gin.H{"status": "Error", "message": "Page not found"})
+        c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "page not found"})
     })
     return r
 }

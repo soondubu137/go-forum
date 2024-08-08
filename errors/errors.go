@@ -5,4 +5,5 @@ const (
     ErrIncorrectCredentials = "incorrect credentials"
     ErrInvalidToken = "invalid token"
     ErrUnauthenticated = "unauthenticated"
+    ErrNotFound = "page not found"
 )
