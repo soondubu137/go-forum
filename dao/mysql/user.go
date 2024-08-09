@@ -3,17 +3,20 @@ package mysql
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
 	"errors"
 
 	errmsg "github.com/SoonDubu923/go-forum/errors"
 	"github.com/SoonDubu923/go-forum/model"
+	"go.uber.org/zap"
 )
 
 // CheckIfUserExists checks if the provided username exists in the database.
 func CheckIfUserExists(username string) (err error) {
     var count int
     if err = db.Get(&count, "SELECT count(id) FROM user WHERE username = ?", username); err != nil {
+        zap.L().Error("CheckIfUserExists failed", zap.String("username", username), zap.Error(err))
         return
     }
     if count > 0 {
@@ -26,10 +29,14 @@ func CheckIfUserExists(username string) (err error) {
 func SaveUser(user *model.User) error {
     // encrypt the password
     if err := encryptPassword(user); err != nil {
+        zap.L().Error("encryptPassword failed", zap.Error(err))
         return err
     }
-    _, err := db.NamedExec("INSERT INTO user (user_id, username, password, salt) VALUES (:user_id, :username, :password, :salt)", user)
-    return err
+    if _, err := db.NamedExec("INSERT INTO user (user_id, username, password, salt) VALUES (:user_id, :username, :password, :salt)", user); err != nil {
+        zap.L().Error("SaveUser failed", zap.Error(err))
+        return err
+    }
+    return nil
 }
 
 func encryptPassword(user *model.User) error {
@@ -57,9 +64,10 @@ func Login(p *model.User) error {
     var user model.User
     // retrieve the user from the database
     if err := db.Get(&user, "SELECT user_id, username, password, salt FROM user WHERE username = ?", p.Username); err != nil {
-        if err.Error() == "sql: no rows in result set" {
+        if err == sql.ErrNoRows {
             return errors.New(errmsg.ErrIncorrectCredentials)
         }
+        zap.L().Error("Login failed", zap.String("username", p.Username), zap.Error(err))
         return err
     }
 
@@ -79,4 +87,14 @@ func Login(p *model.User) error {
     // p is a pointer and the UserID field is needed in the service layer for JWT generation
     p.UserID = user.UserID
     return nil
+}
+
+// GetUsernameByID gets a username by user ID.
+func GetUsernameByID(userID int64) (string, error) {
+    var username string
+    if err := db.Get(&username, "SELECT username FROM user WHERE user_id = ?", userID); err != nil {
+        zap.L().Error("GetUsernameByID failed", zap.Int64("userID", userID), zap.Error(err))
+        return "", err
+    }
+    return username, nil
 }

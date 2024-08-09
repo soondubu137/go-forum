@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/SoonDubu923/go-forum/controller"
 	"github.com/SoonDubu923/go-forum/logger"
 	"github.com/SoonDubu923/go-forum/middleware"
@@ -28,10 +26,12 @@ func Setup(mode string) *gin.Engine {
     {
         v1.GET("/community", controller.CommunityHandler)
         v1.GET("/community/:id", controller.CommunityDetailHandler)
+        v1.POST("/publish", controller.PublishHandler)
+        v1.GET("/post/:id", controller.PostDetailHandler)
     }
 
     r.NoRoute(func(c *gin.Context) {
-        c.JSON(http.StatusNotFound, gin.H{"status": "error", "message": "page not found"})
+        controller.ErrorResponse(c, controller.CodeNotFound)
     })
     return r
 }
