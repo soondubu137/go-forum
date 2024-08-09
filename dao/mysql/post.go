@@ -37,3 +37,13 @@ func GetPostByID(postID int64) (data *model.PostDetail, err error) {
     
     return
 }
+
+// GetPostList returns a list of posts.
+func GetPostList(pageNum, pageSize int64) (data []*model.Post, err error) {
+    data = make([]*model.Post, 0, pageSize)
+    err = db.Select(&data, "SELECT post_id, title, content, author_id, community_id, created_time FROM post ORDER BY created_time DESC LIMIT ?, ?", (pageNum - 1) * pageSize, pageSize)
+    if err != nil {
+        zap.L().Error("GetPostList failed", zap.Error(err))
+    }
+    return
+}

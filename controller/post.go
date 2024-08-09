@@ -64,3 +64,24 @@ func PostDetailHandler(c *gin.Context) {
     // return response
     SuccessResponse(c, CodeSuccess, data)
 }
+
+// PostListHandler handles the request for post list.
+func PostListHandler(c *gin.Context) {
+    // get page info
+    pageNum, pageSize, err := GetPageInfo(c)
+    if err != nil {
+        ErrorResponse(c, CodeInvalidParam)
+        return
+    }
+
+    // hand over to service layer
+    data, err := service.GetPostList(pageNum, pageSize)
+    if err != nil {
+        zap.L().Error("service.GetPostList failed", zap.Error(err))
+        ErrorResponse(c, CodeServerError)
+        return
+    }
+
+    // return response
+    SuccessResponse(c, CodeSuccess, data)
+}

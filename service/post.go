@@ -18,3 +18,8 @@ func Publish(p *model.Post) (err error) {
 func GetPostDetail(postID int64) (*model.PostDetail, error) {
     return mysql.GetPostByID(postID)
 }
+
+// GetPostList returns a list of posts.
+func GetPostList(pageNum, pageSize int64) ([]*model.Post, error) {
+    return mysql.GetPostList(pageNum, pageSize)
+}
