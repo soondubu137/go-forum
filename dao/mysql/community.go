@@ -23,7 +23,8 @@ func GetCommunities() (data []*model.Community, err error) {
 
 // GetCommunityDetailByID returns the details of a community.
 func GetCommunityDetailByID(id int64) (data *model.CommunityDetail, err error) {
-    if err = db.Get(data, "SELECT community_id, name, description, created_time FROM community WHERE community_id = ?", id); err != nil {
+    data = new(model.CommunityDetail)
+    if err = db.Get(data, "SELECT community_id, name, description, create_time FROM community WHERE community_id = ?", id); err != nil {
         if err == sql.ErrNoRows {
             err = errors.New(errmsg.ErrNotFound)
         }
