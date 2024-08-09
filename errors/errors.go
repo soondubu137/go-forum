@@ -6,4 +6,5 @@ const (
     ErrInvalidToken = "invalid token"
     ErrUnauthenticated = "unauthenticated"
     ErrNotFound = "page not found"
+    ErrVoteTimeExpired = "vote time expired"
 )

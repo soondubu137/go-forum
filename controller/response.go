@@ -5,8 +5,8 @@ import "github.com/gin-gonic/gin"
 type Response struct {
     Code    ResponseCode `json:"code"`
     Status  string       `json:"status"`
-    Message any          `json:"message"`
-    Data    any          `json:"data"`
+    Message any          `json:"message,omitempty"`
+    Data    any          `json:"data,omitempty"`
 }
 
 func ErrorResponse(c *gin.Context, code ResponseCode) {
