@@ -7,4 +7,5 @@ const (
     ErrUnauthenticated = "unauthenticated"
     ErrNotFound = "page not found"
     ErrVoteTimeExpired = "vote time expired"
+    ErrVoteTwice = "cannot vote twice"
 )

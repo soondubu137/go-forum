@@ -28,6 +28,10 @@ func VoteForPost(userID int64, p *model.ParamVoteData) error {
     // get user's current vote status
     key := KEY_POST_VOTED_ZSET_PREFIX + strconv.FormatInt(p.PostID, 10)
     curr := rds.ZScore(key, strconv.FormatInt(userID, 10)).Val()
+    // check if the user is trying to vote twice
+    if curr == float64(p.Direction) {
+        return errors.New(errmsg.ErrVoteTwice)
+    }
     var coeff float64
     // coeff is 1 if the user is upvoting, -1 if downvoting
     if curr > float64(p.Direction) {

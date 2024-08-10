@@ -38,5 +38,15 @@ func GetPostListUpdated(p *model.ParamPostList) ([]*model.Post, error) {
         return nil, nil
     }
 
-    return mysql.GetPostListByID(ids)
+    voteData, err := redis.GetPostVoteData(ids)
+    if err != nil {
+        return nil, err
+    }
+
+    data, err := mysql.GetPostListByID(ids)
+    for i, d := range data {
+        d.Votes = voteData[i]
+    }
+
+    return data, err
 }

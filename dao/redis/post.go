@@ -46,3 +46,25 @@ func GetPostsInOrder(p *model.ParamPostList) ([]string, error) {
 
     return rds.ZRevRange(key, start, end).Result()
 }
+
+// GetPostVoteData gets the number of votes for each post.
+func GetPostVoteData(ids []string) ([]int64, error) {
+    data := make([]int64, 0, len(ids))
+    
+    pipe := rds.Pipeline()
+    for _, id := range ids {
+        pipe.ZCount(KEY_POST_VOTED_ZSET_PREFIX + id, "1", "1")
+    }
+    cmds, err := pipe.Exec()
+    if err != nil {
+        return nil, err
+    }
+    for _, cmd := range cmds {
+        count, err := cmd.(*redis.IntCmd).Result()
+        if err != nil {
+            return nil, err
+        }
+        data = append(data, count)
+    }
+    return data, nil
+}
