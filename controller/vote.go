@@ -22,7 +22,7 @@ func VoteHandler(c *gin.Context) {
         } else {
             validationErrors = append(validationErrors, err.Error())
         }
-        zap.L().Error("invalid request parameters for RegisterHandler", zap.Strings("errors", validationErrors))
+        zap.L().Error("invalid request parameters for VoteHandler", zap.Strings("errors", validationErrors))
         ErrorResponseWithMessage(c, CodeInvalidRequest, validationErrors)
         return
     }
@@ -30,6 +30,7 @@ func VoteHandler(c *gin.Context) {
     // hand over to service layer
     userID := GetUser(c)
     if err := service.VoteForPost(userID, &p); err != nil {
+        zap.L().Error("service.VoteForPost() failed", zap.Error(err))
         ErrorResponse(c, CodeServerError)
         return
     }

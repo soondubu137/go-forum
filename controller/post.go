@@ -40,7 +40,6 @@ func PublishHandler(c *gin.Context) {
         return
     }
 
-    // return response
     SuccessResponse(c, CodeCreated, nil)
 }
 
@@ -82,6 +81,38 @@ func PostListHandler(c *gin.Context) {
         return
     }
 
-    // return response
+    SuccessResponse(c, CodeSuccess, data)
+}
+
+// PostListHandlerUpdated handles the request for post list with ordering options.
+// Order options: time, score.
+func PostListHandlerUpdated(c *gin.Context) {
+    // bind request parameters
+    p := &model.ParamPostList{}
+
+    if err := c.ShouldBindQuery(&p); err != nil {
+        var validationErrors []string
+        // collect validation errors, if any
+        if errs, ok := err.(validator.ValidationErrors); ok {
+            for _, err := range errs {
+                validationErrors = append(validationErrors, err.Error())
+            }
+        // if not a validation error, just append the error message
+        } else {
+            validationErrors = append(validationErrors, err.Error())
+        }
+        zap.L().Error("invalid request parameters for PostListHandlerUpdated", zap.Strings("errors", validationErrors))
+        ErrorResponseWithMessage(c, CodeInvalidRequest, validationErrors)
+        return
+    }
+
+    // hand over to service layer
+    data, err := service.GetPostListUpdated(p)
+    if err != nil {
+        zap.L().Error("service.GetPostListUpdated failed", zap.Error(err))
+        ErrorResponse(c, CodeServerError)
+        return
+    }
+
     SuccessResponse(c, CodeSuccess, data)
 }
