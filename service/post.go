@@ -50,3 +50,25 @@ func GetPostListUpdated(p *model.ParamPostList) ([]*model.Post, error) {
 
     return data, err
 }
+
+func GetCommunityPostList(p *model.ParamCommunityPostList) ([]*model.Post, error) {
+    ids, err := redis.GetCommunityPostIDsInOrder(p)
+    if err != nil {
+        return nil, err
+    }
+    if len(ids) == 0 {
+        return nil, nil
+    }
+
+    voteData, err := redis.GetPostVoteData(ids)
+    if err != nil {
+        return nil, err
+    }
+
+    data, err := mysql.GetPostListByID(ids)
+    for i, d := range data {
+        d.Votes = voteData[i]
+    }
+
+    return data, err
+}

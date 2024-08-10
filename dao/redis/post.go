@@ -27,6 +27,9 @@ func CreatePost(p *model.Post) (err error) {
         Member: strconv.FormatInt(p.ID, 10),
     })
 
+    // 3. create post in community set
+    pipe.SAdd(KEY_COMMUNITY_SET_PREFIX + strconv.FormatInt(p.CommunityID, 10), strconv.FormatInt(p.ID, 10))
+
     _, err = pipe.Exec()
     return
 }
@@ -67,4 +70,34 @@ func GetPostVoteData(ids []string) ([]int64, error) {
         data = append(data, count)
     }
     return data, nil
+}
+
+// GetCommunityPostIDsInOrder gets the post IDs of a community in order.
+func GetCommunityPostIDsInOrder(p *model.ParamCommunityPostList) ([]string, error) {
+    communityKey := KEY_COMMUNITY_SET_PREFIX + strconv.FormatInt(p.CommunityID, 10)
+    key := communityKey + "::" + p.Order
+
+    // if the key does not exist, create it
+    if rds.Exists(key).Val() == 0 {
+        var zset string
+        switch p.Order {
+        case "time":
+            zset = KEY_POST_TIME_ZSET
+        case "score":
+            zset = KEY_POST_SCORE_ZSET
+        }
+        pipe := rds.Pipeline()
+        pipe.ZInterStore(key, redis.ZStore{
+            Aggregate: "MAX",
+        }, communityKey, zset)
+        pipe.Expire(key, 60 * time.Second)
+        _, err := pipe.Exec()
+        if err != nil {
+            return nil, err
+        }
+    }
+    start := (p.Page - 1) * p.Size
+    end := start + p.Size - 1
+
+    return rds.ZRevRange(key, start, end).Result()
 }

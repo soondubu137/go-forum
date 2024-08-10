@@ -116,3 +116,34 @@ func PostListHandlerUpdated(c *gin.Context) {
 
     SuccessResponse(c, CodeSuccess, data)
 }
+
+func CommunityPostListHandler(c *gin.Context) {
+    // bind request parameters
+    p := &model.ParamCommunityPostList{}
+
+    if err := c.ShouldBindQuery(&p); err != nil {
+        var validationErrors []string
+        // collect validation errors, if any
+        if errs, ok := err.(validator.ValidationErrors); ok {
+            for _, err := range errs {
+                validationErrors = append(validationErrors, err.Error())
+            }
+        // if not a validation error, just append the error message
+        } else {
+            validationErrors = append(validationErrors, err.Error())
+        }
+        zap.L().Error("invalid request parameters for CommunityPostListHandler", zap.Strings("errors", validationErrors))
+        ErrorResponseWithMessage(c, CodeInvalidRequest, validationErrors)
+        return
+    }
+
+    // hand over to service layer
+    data, err := service.GetCommunityPostList(p)
+    if err != nil {
+        zap.L().Error("service.GetCommunityPostList failed", zap.Error(err))
+        ErrorResponse(c, CodeServerError)
+        return
+    }
+
+    SuccessResponse(c, CodeSuccess, data)
+}
