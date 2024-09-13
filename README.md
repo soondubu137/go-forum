@@ -20,6 +20,8 @@ This project strictly follows the **CSR (controller-service-repository) layered 
 >
 > Sometimes "service" is used interchangeably with "logic", and "repository" with "DAO".
 
+![project structure](https://github.com/soondubu137/go-forum/blob/main/forum-structure.png)
+
 Controller: entrance to the underlying service, responsible for handling routes, parameter validation, and redirection.
 
 Service: responsible for handling specific business logic.
